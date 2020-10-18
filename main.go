@@ -5,6 +5,7 @@ import (
     "fmt"
     "net/http"
     "log"
+    "encoding/json"
     "github.com/gorilla/mux"
 )
 
@@ -63,7 +64,22 @@ func savePerson(w http.ResponseWriter, r *http.Request) {
     log.Printf("Saved Uploaded File Temporarily to %s", inputFilepath)
 
     // ROBERT DO YOUR SHIT HERE AND FILL IN VAR ID
-    id := "thisismyid"
+    otherFields := make(map[string]interface{})
+	for key := range r.Header {
+		if key != "Name" && key != "Title" {
+			otherFields[key] = r.Header.Get(key)
+		}
+	}
+
+	data := Person{
+		Name:         r.Header.Get("Name"),
+		Title:        r.Header.Get("Title"),
+		CustomFields: otherFields,
+	}
+
+	ctx, collection := setupMongo()
+
+	id := insertPerson(ctx, collection, data)
     // END OF ROBERT'S SHIT
 
     res, err := runPyScript("save_face", inputFilepath, id)
@@ -101,7 +117,10 @@ func matchPerson(w http.ResponseWriter, r *http.Request) {
 
     w.WriteHeader(http.StatusOK)
     // ROBERT DO YOUR SHIT HERE AND FILL IN RES JSON
-    fmt.Fprint(w, id)
+    ctx, collection := setupMongo()
+	dataSendBack := queryPerson(ctx, collection, id)
+	delete(dataSendBack, "_id")
+	json.NewEncoder(w).Encode(dataSendBack)
     // END OF ROBERT'S SHIT
 }
 

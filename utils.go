@@ -2,7 +2,8 @@ package main
 
 import (
 	"os"
-	"io/ioutil"
+	"fmt"
+	"strings"
     "net/http"
 	"log"
 	"os/exec"
@@ -10,48 +11,6 @@ import (
 	"bytes"
 	"errors"
 )
-
-func saveReqFile(r *http.Request, filename string) (string, error) {
-    log.Printf("Uploading file to %s...", tempimgfolder)
-
-    // Parse our multipart form, 10 << 20 specifies a maximum
-    // upload of 10 MB files.
-    r.ParseMultipartForm(10 << 20)
-    // FormFile returns the first file for the given key `myFile`
-    // it also returns the FileHeader so we can get the Filename,
-    // the Header and the size of the file
-    file, handler, err := r.FormFile(filename)
-    if err != nil {
-        log.Printf("Error Retrieving File '%s' from Request: %s", filename, err)
-        return "", err
-    }
-    defer file.Close()
-    log.Printf("Uploaded File: %+v", handler.Filename)
-    log.Printf("File Size: %+v", handler.Size)
-    log.Printf("MIME Header: %+v", handler.Header)
-
-    // Create a temporary file within our temp-images directory that follows
-    // a particular naming pattern
-    tempFile, err := ioutil.TempFile(tempimgfolder, "upload-*.png")
-    if err != nil {
-		log.Printf("Error Creating Temp File '%s' from Request: %s", filename, err)
-		return "", err
-    }
-    defer tempFile.Close()
-
-    // read all of the contents of our uploaded file into a
-    // byte array
-    fileBytes, err := ioutil.ReadAll(file)
-    if err != nil {
-		log.Printf("Error Reading Bytes from File '%s' from Request: %s", filename, err)
-		return "", err
-    }
-    // write this byte array to our temporary file
-	tempFile.Write(fileBytes)
-	
-	log.Printf("Successfully uploaded file to %s...", tempimgfolder)
-	return tempFile.Name(), nil
-}
 
 func findPythonFolder(path ...string) (string, error) {
 	envvar := os.Getenv(pfrenvvar)
@@ -105,3 +64,24 @@ func runPyScript(name string, args ...string) (string, error) {
 	log.Print(out.String())
 	return out.String(), nil
 }
+
+// formatRequest generates ascii representation of a request
+func formatRequest(r *http.Request) string {
+	// Create return string
+	var request []string
+	// Add the request string
+	url := fmt.Sprintf("%v %v %v", r.Method, r.URL, r.Proto)
+	request = append(request, url)
+	// Add the host
+	request = append(request, fmt.Sprintf("Host: %v", r.Host))
+	// Loop through headers
+	for name, headers := range r.Header {
+	  name = strings.ToLower(name)
+	  for _, h := range headers {
+		request = append(request, fmt.Sprintf("%v: %v", name, h))
+	  }
+	}
+
+	 // Return the request as a string
+	 return strings.Join(request, "\n")
+   }
