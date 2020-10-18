@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>Server Status</h1>
+    <a href="http://localhost:8080/status"> Check if Server is Online </a>
+    <h1>upload</h1>
+    <form
+      enctype="multipart/form-data"
+      action="http://localhost:8080/upload"
+      method="post"
+    >
+      <input type="file" name="myFile" />
+      <input type="submit" value="upload" />
+    </form>
+    <h1>find boxes</h1>
+    <form
+      enctype="multipart/form-data"
+      action="http://localhost:8080/boxes"
+      method="post"
+    >
+      <input type="file" name="myFile" />
+      <input type="submit" value="upload" />
+    </form>
+    <h1>save person</h1>
+    <form
+      enctype="multipart/form-data"
+      action="http://localhost:8080/save"
+      method="post"
+    >
+      <input type="file" name="myFile" />
+      <input type="submit" value="upload" />
+    </form>
+    <h1>match person</h1>
+    <form
+      enctype="multipart/form-data"
+      action="http://localhost:8080/match"
+      method="post"
+    >
+      <input type="file" name="myFile" />
+      <input type="submit" value="upload" />
+    </form>
+  </body>
+</html>
