@@ -99,7 +99,7 @@ func runPyScript(name string, args ...string) (string, error) {
 	err := cmd.Run()
 
 	if err != nil {
-		log.Printf("Failed to Run Command: %s", cmdErr)
+		log.Printf("Failed to Run Command: %s", cmdErr.String())
 		return "", err
 	}
 	log.Print(out.String())
