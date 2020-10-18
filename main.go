@@ -124,6 +124,10 @@ func setupRoutes() {
 }
 
 func main() {
+    if _, err := os.Stat(tempimgfolder); os.IsNotExist(err) {
+        log.Printf("Temp Image Folder Does Not Exist. Making One at %s", tempimgfolder)
+        os.Mkdir(tempimgfolder, 0700)
+    }
     log.Print("Starting Backend Server...")
     setupRoutes()
 }
