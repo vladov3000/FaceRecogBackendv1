@@ -61,7 +61,7 @@ func runPyScript(name string, args ...string) (string, error) {
 		log.Printf("Failed to Run Command: %s", cmdErr.String())
 		return "", err
 	}
-	log.Print(out.String())
+	log.Printf("k %s k", out.String())
 	return out.String(), nil
 }
 

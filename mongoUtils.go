@@ -21,7 +21,7 @@ type Person struct {
 }
 
 func setupMongo() (context.Context, *mongo.Collection) {
-	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb+srv://generic:atjOcCNVrUgySdJv@facial-recognition.t8kbl.gcp.mongodb.net/<dbname>?retryWrites=true&w=majority"))
+	client, err := mongo.NewClient(options.Client().ApplyURI(mongoKey))
 	if err != nil {
 		log.Printf("Failed to Get MongoDB Client: %s", err)
 	}
@@ -55,6 +55,12 @@ func insertPerson(ctx context.Context, nameOfCollection *mongo.Collection, perso
 }
 
 func queryPerson(ctx context.Context, nameOfCollection *mongo.Collection, itemID string) map[string]interface{} {
+	if itemID == "" {
+		return nil;
+	}
+	if len(itemID) > 24 {
+		itemID = itemID[:25]
+	}
 	objectID, err := primitive.ObjectIDFromHex(itemID[:len(itemID)-1])
 	if err != nil {
 		log.Fatal(err)

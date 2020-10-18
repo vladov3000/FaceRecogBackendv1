@@ -64,19 +64,24 @@ func savePerson(w http.ResponseWriter, r *http.Request) {
     log.Printf("Saved Uploaded File Temporarily to %s", inputFilepath)
 
     // ROBERT DO YOUR SHIT HERE AND FILL IN VAR ID
-    otherFields := make(map[string]interface{})
-	for key := range r.Header {
-		if key != "Name" && key != "Title" {
-			otherFields[key] = r.Header.Get(key)
-		}
-	}
+    // otherFields := make(map[string]interface{})
+	// for key := range r.Header {
+	// 	if key != "Name" && key != "Title" {
+	// 		otherFields[key] = r.Header.Get(key)
+	// 	}
+	// }
 
-	data := Person{
-		Name:         r.Header.Get("Name"),
-		Title:        r.Header.Get("Title"),
-		CustomFields: otherFields,
-	}
-
+	// data := Person{
+	// 	Name:         r.Header.Get("Name"),
+	// 	Title:        r.Header.Get("Title"),
+	// 	CustomFields: otherFields,
+    // }
+    var data Person
+    err = json.NewDecoder(r.Body).Decode(&data)
+    if err != nil {
+        log.Printf("Failed to Decode Body of Request.")
+        return
+    }
 	ctx, collection := setupMongo()
 
 	id := insertPerson(ctx, collection, data)
@@ -113,6 +118,12 @@ func matchPerson(w http.ResponseWriter, r *http.Request) {
     if err != nil {
         log.Printf("Failed to Run Python Script to Match Face: %s", err)
         w.WriteHeader(http.StatusInternalServerError)
+    }
+
+    w.WriteHeader(http.StatusOK)
+    if id == "\n" {
+        fmt.Fprint(w, "{}")
+        return
     }
 
     w.WriteHeader(http.StatusOK)
